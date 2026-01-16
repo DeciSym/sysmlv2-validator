@@ -1,0 +1,62 @@
+.Dd January 16, 2026
+.Dt VALIDATE-SYSML 1
+.Os
+.Sh NAME
+.Nm validate-sysml
+.Nd validate SysML v2 files
+.Sh SYNOPSIS
+.Nm
+.Op Fl hV
+.Ar file.sysml ...
+.Nm
+.Op Fl hV
+.Ar directory
+.Sh DESCRIPTION
+The
+.Nm
+utility validates SysML v2 files using the official parser from the
+SysML v2 Pilot Implementation.
+Errors are reported in GNU format for integration with editors and
+build tools.
+.Pp
+When multiple files are specified, they are processed in order,
+allowing imports between files.
+List files in dependency order (dependencies first).
+.Pp
+When a directory is specified, all
+.Pa .sysml
+files within are validated in alphabetical order.
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl h , -help
+Print usage information and exit.
+.It Fl V , -version
+Print version information and exit.
+.El
+.Sh EXIT STATUS
+.Ex -std
+.Pp
+Exit status 0 indicates all files are valid.
+Exit status 1 indicates validation errors were found.
+.Sh OUTPUT FORMAT
+Errors are output in GNU format:
+.Pp
+.Dl filename:line:column: error: message
+.Sh EXAMPLES
+Validate a single file:
+.Pp
+.Dl $ validate-sysml model.sysml
+.Pp
+Validate multiple files in dependency order:
+.Pp
+.Dl $ validate-sysml types.sysml library.sysml deployment.sysml
+.Pp
+Validate all files in a directory:
+.Pp
+.Dl $ validate-sysml ./models/
+.Sh SEE ALSO
+.Lk https://www.omg.org/spec/SysML/2.0/ "OMG SysML v2 Specification" ,
+.Lk https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation "SysML v2 Pilot Implementation"
+.Sh AUTHORS
+.An DeciSym, LLC
+.Aq Mt support@decisym.ai

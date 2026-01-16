@@ -1,0 +1,40 @@
+#!/bin/sh
+# SysML v2 Validator wrapper script
+# Validates .sysml files using the SysML v2 Pilot Implementation
+
+set -e
+
+# Find the validator installation directory (resolve symlinks)
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT")" && pwd)"
+    SCRIPT="$(readlink "$SCRIPT")"
+    [ "${SCRIPT%"${SCRIPT#?}"}" != "/" ] && SCRIPT="$SCRIPT_DIR/$SCRIPT"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT")" && pwd)"
+
+# Check for installed location first, then development location
+if [ -f "$HOME/.local/share/sysmlv2-validator/sysmlv2-validator.jar" ]; then
+    JAR="$HOME/.local/share/sysmlv2-validator/sysmlv2-validator.jar"
+    SYSML_LIBRARY="$HOME/.local/share/sysmlv2-validator/sysml.library"
+elif [ -f "$SCRIPT_DIR/target/sysmlv2-validator-1.0.0-SNAPSHOT.jar" ]; then
+    JAR="$SCRIPT_DIR/target/sysmlv2-validator-1.0.0-SNAPSHOT.jar"
+    SYSML_LIBRARY="$SCRIPT_DIR/target/sysml-download/sysml/sysml.library"
+else
+    echo "Error: sysmlv2-validator not found." >&2
+    echo "Run 'mvn package' in $SCRIPT_DIR" >&2
+    exit 1
+fi
+
+# Find Java 21+
+if command -v java >/dev/null 2>&1; then
+    JAVA=java
+elif [ -x /usr/local/jdk-21/bin/java ]; then
+    JAVA=/usr/local/jdk-21/bin/java
+else
+    echo "Error: Java 21+ not found" >&2
+    exit 1
+fi
+
+# Run validator
+exec "$JAVA" -Dsysml.library="$SYSML_LIBRARY" -jar "$JAR" "$@"
