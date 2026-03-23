@@ -13,16 +13,16 @@ while [ -L "$SCRIPT" ]; do
 done
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT")" && pwd)"
 
-# Check for installed location first, then development location
-if [ -f "$HOME/.local/share/sysmlv2-validator/sysmlv2-validator.jar" ]; then
-    JAR="$HOME/.local/share/sysmlv2-validator/sysmlv2-validator.jar"
-    SYSML_LIBRARY="$HOME/.local/share/sysmlv2-validator/sysml.library"
-elif [ -f "$SCRIPT_DIR/target/sysmlv2-validator-1.0.0-SNAPSHOT.jar" ]; then
+# Use the Maven build output relative to this script's repository location
+if [ -f "$SCRIPT_DIR/target/sysmlv2-validator-1.0.0-SNAPSHOT.jar" ] &&
+   [ -d "$SCRIPT_DIR/target/sysml-download/sysml/sysml.library" ]; then
     JAR="$SCRIPT_DIR/target/sysmlv2-validator-1.0.0-SNAPSHOT.jar"
     SYSML_LIBRARY="$SCRIPT_DIR/target/sysml-download/sysml/sysml.library"
 else
     echo "Error: sysmlv2-validator not found." >&2
-    echo "Run 'mvn package' in $SCRIPT_DIR" >&2
+    echo "Run these commands in $SCRIPT_DIR:" >&2
+    echo "  mvn -Psetup-dependency initialize" >&2
+    echo "  mvn package" >&2
     exit 1
 fi
 

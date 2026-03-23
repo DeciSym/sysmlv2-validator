@@ -8,6 +8,7 @@ import org.omg.sysml.interactive.SysMLInteractiveResult;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,37 +18,35 @@ import static org.junit.jupiter.api.Assertions.*;
 class SysMLValidatorTest {
 
     private static SysMLInteractive interactive;
-    private static boolean libraryLoaded = false;
 
     @BeforeAll
-    static void setUp() {
+    static void setUp() throws Exception {
         String libraryPath = System.getProperty("sysml.library",
                 "target/sysml-download/sysml/sysml.library");
 
         File libraryDir = new File(libraryPath);
-        if (!libraryDir.isDirectory()) {
-            System.err.println("SKIP: SysML library not found at " + libraryPath);
-            System.err.println("Run 'mvn -Psetup-dependency initialize' first");
-            return;
+        assertTrue(
+                libraryDir.isDirectory(),
+                "SysML library not found at " + libraryPath +
+                        ". Run 'mvn -Psetup-dependency initialize' to bootstrap the SysML library."
+        );
+
+        interactive = SysMLInteractive.getInstance();
+        interactive.loadLibrary(libraryDir.getAbsolutePath());
+    }
+
+    private static String formatIssues(SysMLInteractiveResult result) {
+        if (result.getIssues() == null || result.getIssues().isEmpty()) {
+            return "(no issues reported)";
         }
 
-        try {
-            interactive = SysMLInteractive.getInstance();
-            // Use absolute path - required for EMF to handle spaces in directory names
-            interactive.loadLibrary(libraryDir.getAbsolutePath());
-            libraryLoaded = true;
-        } catch (Exception e) {
-            System.err.println("SKIP: Failed to load SysML library: " + e.getMessage());
-        }
+        return result.getIssues().stream()
+                .map(issue -> issue.getLineNumber() + ":" + issue.getColumn() + ": " + issue.getMessage())
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 
     @Test
     void validFileShouldPass() throws Exception {
-        if (!libraryLoaded) {
-            System.err.println("SKIP: Library not loaded");
-            return;
-        }
-
         Path validFile = Path.of("src/test/resources/simple-valid.sysml");
         assertTrue(Files.exists(validFile), "Test file should exist");
 
@@ -55,22 +54,12 @@ class SysMLValidatorTest {
         SysMLInteractiveResult result = interactive.process(content, true);
 
         assertNull(result.getException(), "Should not throw exception");
-        if (result.hasErrors()) {
-            System.err.println("Validation errors in " + validFile + ":");
-            for (var issue : result.getIssues()) {
-                System.err.println("  " + issue.getLineNumber() + ": " + issue.getMessage());
-            }
-        }
-        assertFalse(result.hasErrors(), "Valid file should not have errors");
+        assertFalse(result.hasErrors(),
+                () -> "Valid file should not have errors:" + System.lineSeparator() + formatIssues(result));
     }
 
     @Test
     void invalidFileShouldFail() throws Exception {
-        if (!libraryLoaded) {
-            System.err.println("SKIP: Library not loaded");
-            return;
-        }
-
         Path invalidFile = Path.of("src/test/resources/simple-invalid.sysml");
         assertTrue(Files.exists(invalidFile), "Test file should exist");
 

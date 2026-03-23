@@ -9,11 +9,23 @@ Command-line validator for SysML v2 files using the OMG Pilot Implementation.
 
 ## Build
 
+First-time setup, and after `mvn clean`:
+
 ```sh
+mvn -Psetup-dependency initialize
 mvn package
 ```
 
-The SysML v2 Pilot Implementation is auto-downloaded from GitHub releases.
+The OMG SysML v2 Pilot Implementation is released on GitHub, not
+published to Maven Central. The `setup-dependency` profile downloads
+the release and installs the kernel JAR into your local Maven
+repository.
+
+Regular rebuilds without cleaning:
+
+```sh
+mvn package
+```
 
 ## Install
 
