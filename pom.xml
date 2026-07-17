@@ -29,8 +29,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <sysml.release.tag>2025-12</sysml.release.tag>
-        <sysml.artifact.version>0.55.0</sysml.artifact.version>
+        <sysml.release.tag>2026-05</sysml.release.tag>
+        <sysml.artifact.version>0.60.1</sysml.artifact.version>
         <sysml.release.url>https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/releases/download/${sysml.release.tag}</sysml.release.url>
     </properties>
 
@@ -193,7 +193,11 @@
                                 </goals>
                                 <configuration>
                                     <file>${project.build.directory}/sysml-download/sysml/jupyter-sysml-kernel-${sysml.artifact.version}-all.jar</file>
-                                    <pomFile>${project.basedir}/jupyter-sysml-kernel.pom</pomFile>
+                                    <groupId>org.omg.sysml</groupId>
+                                    <artifactId>jupyter-sysml-kernel</artifactId>
+                                    <version>${sysml.artifact.version}</version>
+                                    <packaging>jar</packaging>
+                                    <generatePom>true</generatePom>
                                 </configuration>
                             </execution>
                         </executions>
