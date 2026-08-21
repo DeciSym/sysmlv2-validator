@@ -29,8 +29,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <sysml.release.tag>2026-05</sysml.release.tag>
-        <sysml.artifact.version>0.60.1</sysml.artifact.version>
+        <sysml.release.tag>2026-07</sysml.release.tag>
+        <sysml.artifact.version>0.61.0</sysml.artifact.version>
         <sysml.release.url>https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/releases/download/${sysml.release.tag}</sysml.release.url>
     </properties>
 
